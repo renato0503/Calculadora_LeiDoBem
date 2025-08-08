@@ -3,27 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin</title>
+    <title>Calculadora - Lei do Bem</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body onload="verificarLoginAdmin()">
+<body onload="verificarLogin()">
     <div class="container">
         <button onclick="logout()" class="btn-logout">Sair</button>
-        <h1>Painel do Administrador</h1>
-        
-        <form id="create-user-form">
-            <h3>Criar Novo Usuário para a Calculadora</h3>
-            <input type="text" id="new-username" placeholder="Nome do novo usuário" required>
-            <input type="password" id="new-password" placeholder="Senha do novo usuário" required>
-            <button type="submit">Criar Usuário</button>
-        </form>
+        <h1>Questionário de Aderência à Lei do Bem</h1>
+        <p>Responda às perguntas abaixo para avaliar a elegibilidade da sua empresa.</p>
 
-        <div class="user-list">
-            <h3>Usuários Cadastrados</h3>
-            <ul id="lista-usuarios">
-                <!-- A lista de usuários será inserida aqui pelo JavaScript -->
-            </ul>
-        </div>
+        <form id="calculadora-form">
+            <!-- Requisitos Básicos -->
+            <fieldset>
+                <legend>Requisitos de Enquadramento</legend>
+                <label><input type="checkbox" id="lucro-real"> A empresa está no regime de tributação de Lucro Real?</label>
+                <label><input type="checkbox" id="regularidade-fiscal"> A empresa possui Regularidade Fiscal (Certidão Negativa de Débitos)?</label>
+                <label><input type="checkbox" id="lucro-tributavel"> A empresa apurou Lucro Tributável no exercício fiscal?</label>
+            </fieldset>
+
+            <!-- Investimentos -->
+            <fieldset>
+                <legend>Investimentos em P&D</legend>
+                <label for="dispêndios-pd">Total de dispêndios em Pesquisa, Desenvolvimento e Inovação (P&D) no ano (R$):</label>
+                <input type="number" id="dispêndios-pd" placeholder="Ex: 500000" step="0.01">
+            </fieldset>
+            
+            <!-- Detalhes para o Relatório -->
+            <fieldset>
+                <legend>Descreva seu Projeto</legend>
+                <textarea id="descricao-projeto" placeholder="Descreva brevemente o principal projeto de inovação tecnológica, os desafios e os resultados esperados. Isso ajudará a gerar um relatório mais preciso." rows="5"></textarea>
+            </fieldset>
+
+            <button type="submit" id="btn-gerar-relatorio">Calcular Incentivo e Gerar Relatório</button>
+            <div id="loading" class="hidden">Gerando relatório, por favor aguarde...</div>
+        </form>
     </div>
     <script src="script.js"></script>
 </body>
