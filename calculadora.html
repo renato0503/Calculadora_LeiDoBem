@@ -8,34 +8,75 @@
 </head>
 <body onload="verificarLogin()">
     <div class="container">
-        <button onclick="logout()" class="btn-logout">Sair</button>
-        <h1>Questionário de Aderência à Lei do Bem</h1>
-        <p>Responda às perguntas abaixo para avaliar a elegibilidade da sua empresa.</p>
+        <header class="page-header">
+            <h1>Diagnóstico de Aderência à Lei do Bem</h1>
+            <button onclick="logout()" class="btn-logout">Sair</button>
+        </header>
+        <p>Preencha os campos abaixo para uma análise detalhada da elegibilidade e potencial de incentivo fiscal para sua empresa.</p>
 
         <form id="calculadora-form">
-            <!-- Requisitos Básicos -->
+
             <fieldset>
-                <legend>Requisitos de Enquadramento</legend>
-                <label><input type="checkbox" id="lucro-real"> A empresa está no regime de tributação de Lucro Real?</label>
-                <label><input type="checkbox" id="regularidade-fiscal"> A empresa possui Regularidade Fiscal (Certidão Negativa de Débitos)?</label>
-                <label><input type="checkbox" id="lucro-tributavel"> A empresa apurou Lucro Tributável no exercício fiscal?</label>
+                <legend>1. Caracterização da Empresa</legend>
+                <label for="nome_empresa">Nome da Empresa:</label>
+                <input type="text" id="nome_empresa" placeholder="Digite o nome da sua empresa" required>
+
+                <label for="cnpj">CNPJ:</label>
+                <input type="text" id="cnpj" placeholder="00.000.000/0001-00" required>
+
+                <label for="setor_atuacao">Setor de Atuação:</label>
+                <input type="text" id="setor_atuacao" placeholder="Ex: Tecnologia da Informação, Indústria Metalúrgica, Agronegócio" required>
             </fieldset>
 
-            <!-- Investimentos -->
             <fieldset>
-                <legend>Investimentos em P&D</legend>
-                <label for="dispêndios-pd">Total de dispêndios em Pesquisa, Desenvolvimento e Inovação (P&D) no ano (R$):</label>
-                <input type="number" id="dispêndios-pd" placeholder="Ex: 500000" step="0.01">
-            </fieldset>
-            
-            <!-- Detalhes para o Relatório -->
-            <fieldset>
-                <legend>Descreva seu Projeto</legend>
-                <textarea id="descricao-projeto" placeholder="Descreva brevemente o principal projeto de inovação tecnológica, os desafios e os resultados esperados. Isso ajudará a gerar um relatório mais preciso." rows="5"></textarea>
+                <legend>2. Requisitos de Enquadramento</legend>
+                <div class="question">
+                    <span>A empresa está no regime de tributação de Lucro Real?</span>
+                    <div class="radio-group">
+                        <input type="radio" id="lucro-real-sim" name="lucro-real" value="sim" required><label for="lucro-real-sim">Sim</label>
+                        <input type="radio" id="lucro-real-nao" name="lucro-real" value="nao"><label for="lucro-real-nao">Não</label>
+                    </div>
+                </div>
+                <div class="question">
+                    <span>A empresa possui Regularidade Fiscal (Certidão Negativa de Débitos)?</span>
+                    <div class="radio-group">
+                        <input type="radio" id="regularidade-fiscal-sim" name="regularidade-fiscal" value="sim" required><label for="regularidade-fiscal-sim">Sim</label>
+                        <input type="radio" id="regularidade-fiscal-nao" name="regularidade-fiscal" value="nao"><label for="regularidade-fiscal-nao">Não</label>
+                    </div>
+                </div>
+                <div class="question">
+                    <span>A empresa apurou Lucro Tributável no exercício fiscal de referência?</span>
+                    <div class="radio-group">
+                        <input type="radio" id="lucro-tributavel-sim" name="lucro-tributavel" value="sim" required><label for="lucro-tributavel-sim">Sim</label>
+                        <input type="radio" id="lucro-tributavel-nao" name="lucro-tributavel" value="nao"><label for="lucro-tributavel-nao">Não</label>
+                    </div>
+                </div>
             </fieldset>
 
-            <button type="submit" id="btn-gerar-relatorio">Calcular Incentivo e Gerar Relatório</button>
-            <div id="loading" class="hidden">Gerando relatório, por favor aguarde...</div>
+            <fieldset>
+                <legend>3. Caracterização do Projeto Inovador</legend>
+                <label for="titulo_projeto">Título do Projeto:</label>
+                <input type="text" id="titulo_projeto" placeholder="Ex: Plataforma de Otimização Logística com IA" required>
+
+                <label for="objetivo_principal">Principal Objetivo do Projeto:</label>
+                <textarea id="objetivo_principal" rows="3" placeholder="Descreva em uma ou duas frases o que o projeto visa alcançar. Ex: Desenvolver um novo produto para o mercado X ou otimizar o processo produtivo Y." required></textarea>
+                
+                <label for="desafio_tecnologico">Incerteza Tecnológica e Desafio:</label>
+                <textarea id="desafio_tecnologico" rows="4" placeholder="Esta é a parte mais importante. Descreva qual é a dificuldade técnica. Ex: 'Não sabemos qual o melhor algoritmo para...', 'Precisamos criar um novo material que suporte...', 'A integração destas tecnologias nunca foi feita antes...'" required></textarea>
+
+                <label for="resultados_esperados">Resultados Esperados:</label>
+                <textarea id="resultados_esperados" rows="3" placeholder="O que se espera ao final do projeto? Ex: Um protótipo funcional, um produto 20% mais eficiente, a redução de custos em 15%, a publicação de um artigo." required></textarea>
+
+            </fieldset>
+
+            <fieldset>
+                <legend>4. Investimentos em P&D</legend>
+                <label for="dispêndios-pd">Total de dispêndios elegíveis com Pesquisa & Desenvolvimento no ano (R$):</label>
+                <input type="number" id="dispêndios-pd" placeholder="Ex: 500000" step="0.01" required>
+            </fieldset>
+
+            <button type="submit" id="btn-gerar-relatorio">Gerar Diagnóstico Completo</button>
+            <div id="loading" class="hidden">Analisando dados e gerando relatório consultivo. Por favor, aguarde...</div>
         </form>
     </div>
     <script src="script.js"></script>
