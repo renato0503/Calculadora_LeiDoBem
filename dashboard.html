@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="verificarLoginAdmin()">
+    <div class="container">
+        <button onclick="logout()" class="btn-logout">Sair</button>
+        <h1>Painel do Administrador</h1>
+        
+        <form id="create-user-form">
+            <h3>Criar Novo Usuário para a Calculadora</h3>
+            <input type="text" id="new-username" placeholder="Nome do novo usuário" required>
+            <input type="password" id="new-password" placeholder="Senha do novo usuário" required>
+            <button type="submit">Criar Usuário</button>
+        </form>
+
+        <div class="user-list">
+            <h3>Usuários Cadastrados</h3>
+            <ul id="lista-usuarios">
+                <!-- A lista de usuários será inserida aqui pelo JavaScript -->
+            </ul>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
