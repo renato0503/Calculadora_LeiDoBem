@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Roteamento simples baseado na URL da página
     const path = window.location.pathname.split("/").pop();
 
-    if (path === 'index.html' || path === '') {
+    if (path === 'index.html' || path === '' || path === 'Calculadora_LeiDoBem') {
         const loginForm = document.getElementById('login-form');
         if (loginForm) loginForm.addEventListener('submit', handleLogin);
     } else if (path === 'dashboard.html') {
@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-// --- DADOS E CHAVE API ---
-const GEMINI_API_KEY = "AIzaSyB1vkM_lpjSnylhrB244rdHdI1_D4BzsgM"; // <-- COLOQUE SUA CHAVE AQUI
+
+// --- DADOS ---
 
 // Função para inicializar os usuários (simulando um banco de dados)
 function getInitialUsers() {
@@ -94,8 +94,10 @@ function handleCreateUser(event) {
 }
 
 function populateUserList() {
-    const users = getInitialUsers();
     const userListElement = document.getElementById('lista-usuarios');
+    if (!userListElement) return;
+    
+    const users = getInitialUsers();
     userListElement.innerHTML = ''; // Limpa a lista antes de preencher
 
     users.forEach(user => {
@@ -111,10 +113,17 @@ function populateUserList() {
 
 async function handleCalculadora(event) {
     event.preventDefault();
+
+    // VERSÃO SEGURA: Pede a chave ao usuário
+    const GEMINI_API_KEY = prompt("Por favor, insira sua NOVA chave de API do Google Gemini para gerar o relatório:");
+    if (!GEMINI_API_KEY) {
+        alert("A chave de API é necessária para continuar.");
+        return;
+    }
+
     document.getElementById('loading').classList.remove('hidden');
     document.getElementById('btn-gerar-relatorio').disabled = true;
 
-    // Coleta as respostas do formulário
     const respostas = {
         lucroReal: document.getElementById('lucro-real').checked,
         regularidadeFiscal: document.getElementById('regularidade-fiscal').checked,
@@ -123,19 +132,13 @@ async function handleCalculadora(event) {
         descricaoProjeto: document.getElementById('descricao-projeto').value
     };
 
-    // Lógica de cálculo do incentivo
     let incentivo = 0;
     if (respostas.lucroReal && respostas.regularidadeFiscal && respostas.lucroTributavel && respostas.dispendiosPD > 0) {
-        // Exclusão adicional de 60% dos dispêndios (pode ir até 100%)
-        // Para este protótipo, usaremos a base de 60%
         const baseIncentivo = respostas.dispendiosPD * 0.60; 
-        
-        // Alíquota de 34% (25% IRPJ + 9% CSLL)
         incentivo = baseIncentivo * 0.34;
     }
     
-    // Gera o relatório com a API do Gemini
-    const prompt = `
+    const promptText = `
         Você é um consultor especialista na "Lei do Bem" (Lei nº 11.196/2005) do Brasil.
         Uma empresa preencheu um formulário de avaliação. Analise os dados abaixo e gere um relatório técnico detalhado.
 
@@ -162,20 +165,23 @@ async function handleCalculadora(event) {
     `;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+        // VERSÃO CORRIGIDA: Usa o modelo 'gemini-1.0-pro'
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
         });
 
         if (!response.ok) {
-            throw new Error("A resposta da API não foi bem-sucedida.");
+            // Tenta ler o corpo do erro para dar uma mensagem mais específica
+            const errorBody = await response.json().catch(() => null);
+            const errorMessage = errorBody?.error?.message || "A resposta da API não foi bem-sucedida.";
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
         const relatorioGerado = data.candidates[0].content.parts[0].text;
 
-        // Salva os resultados para a próxima página
         localStorage.setItem('valorIncentivo', incentivo.toFixed(2));
         localStorage.setItem('relatorioGerado', relatorioGerado);
 
@@ -183,7 +189,7 @@ async function handleCalculadora(event) {
 
     } catch (error) {
         console.error("Erro ao chamar a API do Gemini:", error);
-        alert("Ocorreu um erro ao gerar o relatório. Verifique sua chave de API e a conexão com a internet.");
+        alert(`Ocorreu um erro ao gerar o relatório: ${error.message}`);
     } finally {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('btn-gerar-relatorio').disabled = false;
@@ -191,7 +197,7 @@ async function handleCalculadora(event) {
 }
 
 function exibirRelatorio() {
-    verificarLogin(); // Garante que só usuários logados vejam o relatório
+    verificarLogin();
     const valorIncentivo = localStorage.getItem('valorIncentivo');
     const relatorioGerado = localStorage.getItem('relatorioGerado');
 
