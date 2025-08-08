@@ -8,7 +8,12 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (path === 'dashboard.html') {
         const createUserForm = document.getElementById('create-user-form');
         if (createUserForm) createUserForm.addEventListener('submit', handleCreateUser);
-        populateUserList();
+        
+        // Adiciona o "ouvinte" para os cliques de exclusão na lista de usuários
+        const userListElement = document.getElementById('lista-usuarios');
+        if(userListElement) userListElement.addEventListener('click', handleDeleteUser);
+        
+        populateUserList(); // Popula a lista assim que a página carrega
     } else if (path === 'calculadora.html') {
         const calculadoraForm = document.getElementById('calculadora-form');
         if (calculadoraForm) calculadoraForm.addEventListener('submit', handleCalculadora);
@@ -80,15 +85,41 @@ function handleCreateUser(event) {
     alert('Usuário criado com sucesso!');
 }
 
+// Função para lidar com o clique no botão de exclusão
+function handleDeleteUser(event) {
+    // Verifica se o elemento clicado foi um botão com a classe 'btn-delete'
+    if (event.target.classList.contains('btn-delete')) {
+        const usernameToDelete = event.target.dataset.username;
+
+        // Pede confirmação para evitar exclusões acidentais
+        if (confirm(`Tem certeza que deseja excluir o usuário '${usernameToDelete}'? Esta ação não pode ser desfeita.`)) {
+            let users = getInitialUsers();
+            // Filtra o array, mantendo todos os usuários EXCETO o que será deletado
+            users = users.filter(user => user.username !== usernameToDelete);
+            // Salva o novo array de usuários de volta no localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            // Atualiza a lista na tela
+            populateUserList();
+        }
+    }
+}
+
+// Agora cria o botão de exclusão junto com o nome do usuário
 function populateUserList() {
     const userListElement = document.getElementById('lista-usuarios');
     if (!userListElement) return;
     const users = getInitialUsers();
     userListElement.innerHTML = '';
+    
     users.forEach(user => {
+        // Não mostra o usuário 'admin' na lista para que ele não possa ser excluído
         if (user.username !== 'admin') {
             const li = document.createElement('li');
-            li.textContent = user.username;
+            // Adiciona o nome do usuário e o botão de exclusão com o `data-username`
+            li.innerHTML = `
+                <span>${user.username}</span>
+                <button class="btn-delete" data-username="${user.username}">Excluir</button>
+            `;
             userListElement.appendChild(li);
         }
     });
@@ -107,28 +138,22 @@ async function handleCalculadora(event) {
     document.getElementById('loading').classList.remove('hidden');
     document.getElementById('btn-gerar-relatorio').disabled = true;
 
-    // Função auxiliar para pegar valor de radio button
     const getRadioValue = (name) => {
         const radio = document.querySelector(`input[name="${name}"]:checked`);
         return radio ? radio.value : 'nao';
     };
 
     const dados = {
-        // Empresa
         nomeEmpresa: document.getElementById('nome_empresa').value,
         cnpj: document.getElementById('cnpj').value,
         setor: document.getElementById('setor_atuacao').value,
-        // Requisitos
         lucroReal: getRadioValue('lucro-real'),
         regularidadeFiscal: getRadioValue('regularidade-fiscal'),
         lucroTributavel: getRadioValue('lucro-tributavel'),
-        // Projeto
         tituloProjeto: document.getElementById('titulo_projeto').value,
         objetivo: document.getElementById('objetivo_principal').value,
         desafio: document.getElementById('desafio_tecnologico').value,
         resultados: document.getElementById('resultados_esperados').value,
-        // Financeiro
-        // AQUI ESTÁ A CORREÇÃO: 'dispêndios-pd' virou 'dispendios-pd'
         dispendiosPD: parseFloat(document.getElementById('dispendios-pd').value) || 0
     };
 
