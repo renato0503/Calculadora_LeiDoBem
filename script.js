@@ -105,13 +105,10 @@ function populateUserList() {
     });
 }
 
-// --- FUNÇÕES DA CALCULADORA E RELATÓRIO ---
-
-// ***** NOVA VERSÃO COM GROQ API *****
+// --- FUNÇÕES DA CALCULADORA E RELATÓRIO COM GROQ API ---
 async function handleCalculadora(event) {
     event.preventDefault();
 
-    // MODO SEGURO: Pede a chave ao usuário. Essencial para repositórios públicos.
     const GROQ_API_KEY = prompt("Por favor, insira sua chave de API da Groq:");
     if (!GROQ_API_KEY) {
         alert("A chave de API é necessária para continuar.");
@@ -137,28 +134,24 @@ async function handleCalculadora(event) {
     
     const promptText = `
         Você é um consultor especialista na "Lei do Bem" (Lei nº 11.196/2005) do Brasil.
-        Uma empresa preencheu um formulário de avaliação. Analise os dados abaixo e gere um relatório técnico detalhado.
+        Uma empresa preencheu um formulário de avaliação. Analise os dados abaixo e gere um relatório técnico profissional e bem estruturado.
 
         **Dados da Empresa:**
         - Regime de Tributação: ${respostas.lucroReal ? "Lucro Real" : "Outro (Não elegível)"}
         - Regularidade Fiscal: ${respostas.regularidadeFiscal ? "Sim (Elegível)" : "Não (Não elegível)"}
         - Apurou Lucro Tributável: ${respostas.lucroTributavel ? "Sim (Elegível)" : "Não (Impede o aproveitamento no ano)"}
-        - Valor dos Dispêndios com P&D: R$ ${respostas.dispendiosPD.toFixed(2)}
+        - Valor dos Dispêndios com P&D: R$ ${respostas.dispendiosPD.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}
         - Breve Descrição do Projeto: "${respostas.descricaoProjeto}"
 
-        **Seu relatório deve conter:**
-        1.  **Análise de Elegibilidade:** Com base nos requisitos de enquadramento, informe de maneira clara se a empresa é elegível ou não. Se não for, explique exatamente qual requisito não foi atendido e o que isso significa.
-        2.  **Estimativa do Benefício:** Mencione que o benefício fiscal estimado é de aproximadamente R$ ${incentivo.toFixed(2)}, explicando que este valor é uma redução do IRPJ e da CSLL devidos.
-        3.  **Próximos Passos e Recomendações:** Crie uma lista de ações (checklist) que a empresa deve seguir. Detalhe a importância de:
-            - Controle e segregação contábil dos gastos com P&D.
-            - Elaboração de relatórios técnicos detalhados para cada projeto, conforme o Manual de Frascati.
-            - Registro de horas dos profissionais envolvidos.
-            - Documentação de propriedade intelectual (patentes).
-            - Envio do formulário FORMP&D ao MCTI.
-            - A nova obrigação da DIRBI.
-        4.  **Conclusão:** Finalize com um parágrafo encorajador sobre os benefícios estratégicos de usar a Lei do Bem.
+        **Formato do Relatório:**
+        Gere uma resposta clara e organizada. Use **negrito** para títulos de seção, como **Análise de Elegibilidade**, **Estimativa do Benefício**, **Checklist de Próximos Passos** e **Conclusão**.
+        No checklist, use uma lista numerada para as recomendações.
 
-        Formate sua resposta usando títulos e listas para fácil leitura.
+        **Conteúdo Obrigatório:**
+        1.  **Análise de Elegibilidade:** Com base nos requisitos, informe se a empresa é elegível. Se não for, explique o motivo.
+        2.  **Estimativa do Benefício:** Mencione que o benefício fiscal estimado é de aproximadamente ${incentivo.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}, explicando que é uma redução do IRPJ e da CSLL.
+        3.  **Checklist de Próximos Passos:** Crie uma lista numerada de ações que a empresa deve seguir, detalhando a importância de: controle contábil, relatórios técnicos (Manual de Frascati), registro de horas, documentação de propriedade intelectual, envio do FORMP&D e a obrigação da DIRBI.
+        4.  **Conclusão:** Finalize com um parágrafo encorajador sobre os benefícios estratégicos da Lei do Bem.
     `;
 
     try {
@@ -166,10 +159,10 @@ async function handleCalculadora(event) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${GROQ_API_KEY}` // Formato Bearer é crucial
+                'Authorization': `Bearer ${GROQ_API_KEY}`
             },
             body: JSON.stringify({
-                model: "llama3-8b-8192", // Um dos modelos mais rápidos e eficientes da Groq
+                model: "llama3-8b-8192",
                 messages: [{
                     "role": "user",
                     "content": promptText
@@ -183,7 +176,6 @@ async function handleCalculadora(event) {
         }
 
         const data = await response.json();
-        // A estrutura da resposta da Groq/OpenAI é diferente da do Gemini
         const relatorioGerado = data.choices[0].message.content;
 
         localStorage.setItem('valorIncentivo', incentivo.toFixed(2));
@@ -207,6 +199,11 @@ function exibirRelatorio() {
 
     if (valorIncentivo && relatorioGerado) {
         document.getElementById('valor-incentivo').textContent = `R$ ${parseFloat(valorIncentivo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-        document.getElementById('conteudo-relatorio').textContent = relatorioGerado;
+        
+        // Converte a marcação **texto** para a tag HTML <strong>texto</strong> (negrito)
+        const relatorioComHTML = relatorioGerado.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Usa .innerHTML para que o navegador renderize as tags HTML que criamos
+        document.getElementById('conteudo-relatorio').innerHTML = relatorioComHTML;
     }
-}``
+}
