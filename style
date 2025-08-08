@@ -179,3 +179,39 @@ legend {
     color: #0056b3;
     font-size: 1.1rem;
 }
+
+/* NOVAS REGRAS PARA A LISTA DE USUÁRIOS */
+.user-list {
+    margin-top: 30px;
+    padding: 0;
+    list-style-type: none;
+}
+
+.user-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 1rem;
+}
+
+.user-list li:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: normal; /* Sobrescreve o font-weight de button */
+    transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
