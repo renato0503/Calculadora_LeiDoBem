@@ -1,6 +1,5 @@
 // Aguarda o carregamento completo da página para adicionar os eventos
 document.addEventListener("DOMContentLoaded", function() {
-    // Roteamento simples baseado na URL da página
     const path = window.location.pathname.split("/").pop();
 
     if (path === 'index.html' || path === '' || path === 'Calculadora_LeiDoBem') {
@@ -19,14 +18,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // --- DADOS ---
 
-// Função para inicializar os usuários (simulando um banco de dados)
 function getInitialUsers() {
     let users = localStorage.getItem('users');
     if (!users) {
-        // Cria o usuário admin se não existir
         users = [{ username: 'admin', password: 'admin' }];
         localStorage.setItem('users', JSON.stringify(users));
-        return users;
     }
     return JSON.parse(users);
 }
@@ -42,7 +38,7 @@ function handleLogin(event) {
     const foundUser = users.find(user => user.username === username && user.password === password);
 
     if (foundUser) {
-        localStorage.setItem('loggedInUser', username); // Guarda o usuário logado
+        localStorage.setItem('loggedInUser', username);
         if (username === 'admin') {
             window.location.href = 'dashboard.html';
         } else {
@@ -89,7 +85,7 @@ function handleCreateUser(event) {
     localStorage.setItem('users', JSON.stringify(users));
     
     document.getElementById('create-user-form').reset();
-    populateUserList(); // Atualiza a lista na tela
+    populateUserList();
     alert('Usuário criado com sucesso!');
 }
 
@@ -98,10 +94,10 @@ function populateUserList() {
     if (!userListElement) return;
     
     const users = getInitialUsers();
-    userListElement.innerHTML = ''; // Limpa a lista antes de preencher
+    userListElement.innerHTML = '';
 
     users.forEach(user => {
-        if (user.username !== 'admin') { // Não mostra o admin na lista
+        if (user.username !== 'admin') {
             const li = document.createElement('li');
             li.textContent = user.username;
             userListElement.appendChild(li);
@@ -111,12 +107,13 @@ function populateUserList() {
 
 // --- FUNÇÕES DA CALCULADORA E RELATÓRIO ---
 
+// ***** NOVA VERSÃO COM GROQ API *****
 async function handleCalculadora(event) {
     event.preventDefault();
 
-    // VERSÃO SEGURA: Pede a chave ao usuário
-    const GEMINI_API_KEY = prompt("Por favor, insira sua NOVA chave de API do Google Gemini para gerar o relatório:");
-    if (!GEMINI_API_KEY) {
+    // MODO SEGURO: Pede a chave ao usuário. Essencial para repositórios públicos.
+    const GROQ_API_KEY = prompt("Por favor, insira sua chave de API da Groq:");
+    if (!GROQ_API_KEY) {
         alert("A chave de API é necessária para continuar.");
         return;
     }
@@ -165,22 +162,29 @@ async function handleCalculadora(event) {
     `;
 
     try {
-        // VERSÃO CORRIGIDA: Usa o modelo 'gemini-1.0-pro'
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}` // Formato Bearer é crucial
+            },
+            body: JSON.stringify({
+                model: "llama3-8b-8192", // Um dos modelos mais rápidos e eficientes da Groq
+                messages: [{
+                    "role": "user",
+                    "content": promptText
+                }]
+            })
         });
 
         if (!response.ok) {
-            // Tenta ler o corpo do erro para dar uma mensagem mais específica
-            const errorBody = await response.json().catch(() => null);
-            const errorMessage = errorBody?.error?.message || "A resposta da API não foi bem-sucedida.";
-            throw new Error(errorMessage);
+            const errorBody = await response.json().catch(() => ({ error: { message: "Erro desconhecido." } }));
+            throw new Error(errorBody.error.message);
         }
 
         const data = await response.json();
-        const relatorioGerado = data.candidates[0].content.parts[0].text;
+        // A estrutura da resposta da Groq/OpenAI é diferente da do Gemini
+        const relatorioGerado = data.choices[0].message.content;
 
         localStorage.setItem('valorIncentivo', incentivo.toFixed(2));
         localStorage.setItem('relatorioGerado', relatorioGerado);
@@ -188,7 +192,7 @@ async function handleCalculadora(event) {
         window.location.href = 'relatorio.html';
 
     } catch (error) {
-        console.error("Erro ao chamar a API do Gemini:", error);
+        console.error("Erro ao chamar a API da Groq:", error);
         alert(`Ocorreu um erro ao gerar o relatório: ${error.message}`);
     } finally {
         document.getElementById('loading').classList.add('hidden');
@@ -205,4 +209,4 @@ function exibirRelatorio() {
         document.getElementById('valor-incentivo').textContent = `R$ ${parseFloat(valorIncentivo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
         document.getElementById('conteudo-relatorio').textContent = relatorioGerado;
     }
-}
+}``
