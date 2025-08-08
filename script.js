@@ -128,11 +128,14 @@ async function handleCalculadora(event) {
         desafio: document.getElementById('desafio_tecnologico').value,
         resultados: document.getElementById('resultados_esperados').value,
         // Financeiro
-        dispendiosPD: parseFloat(document.getElementById('dispêndios-pd').value) || 0
+        // AQUI ESTÁ A CORREÇÃO: 'dispêndios-pd' virou 'dispendios-pd'
+        dispendiosPD: parseFloat(document.getElementById('dispendios-pd').value) || 0
     };
 
     let incentivo = 0;
-    if (dados.lucroReal === 'sim' && dados.regularidadeFiscal === 'sim' && dados.lucroTributavel === 'sim' && dados.dispendiosPD > 0) {
+    const isElegivel = dados.lucroReal === 'sim' && dados.regularidadeFiscal === 'sim' && dados.lucroTributavel === 'sim';
+    
+    if (isElegivel && dados.dispendiosPD > 0) {
         const baseIncentivo = dados.dispendiosPD * 0.60; 
         incentivo = baseIncentivo * 0.34;
     }
@@ -163,13 +166,13 @@ async function handleCalculadora(event) {
         **Data do Diagnóstico:** ${new Date().toLocaleDateString('pt-BR')}
 
         **1. Análise de Elegibilidade**
-        (Analise os 3 requisitos de enquadramento. Se todos forem 'SIM', afirme que a empresa é elegível. Se algum for 'NÃO', explique de forma clara e direta qual requisito não foi atendido e por que isso impede o usufruto do benefício.)
+        (Regra: Para ser elegível, a empresa precisa atender aos 3 requisitos: Lucro Real, Regularidade Fiscal e Lucro Tributável. Avalie os dados. Se **isElegivel** for verdadeiro, que é o caso se os 3 requisitos forem 'SIM', afirme que a empresa CUMPRIU os requisitos formais de enquadramento. Se algum for 'NÃO', afirme que a empresa NÃO É ELEGÍVEL e explique de forma clara qual requisito não foi atendido e por que isso impede o usufruto do benefício.)
 
         **2. Análise do Projeto (${dados.tituloProjeto})**
         (Com base na descrição do desafio e da incerteza tecnológica, avalie se o projeto tem características de inovação tecnológica para a Lei do Bem. Destaque os pontos positivos da descrição que evidenciam o caráter inovador.)
 
         **3. Estimativa do Benefício Fiscal**
-        (Apresente o valor do benefício fiscal, que é de aproximadamente **${incentivo.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}**. Explique de forma simples que este valor representa uma economia (redução) no Imposto de Renda (IRPJ) e na Contribuição Social (CSLL) devidos pela empresa. Se a empresa não for elegível, informe que o cálculo não se aplica e explique o porquê.)
+        (Regra: O cálculo só se aplica se a empresa for elegível. Se for, apresente o valor do benefício fiscal, que é de aproximadamente **${incentivo.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})}**. Explique que este valor representa uma economia no IRPJ e na CSLL. Se a empresa não for elegível, informe que o cálculo não se aplica e reforce o motivo.)
 
         **4. Checklist de Próximos Passos e Recomendações**
         (Crie uma lista numerada de ações práticas que a empresa deve seguir para garantir a segurança e o compliance do benefício.)
@@ -180,7 +183,7 @@ async function handleCalculadora(event) {
         5. **Obrigações Acessórias (FORMP&D e DIRBI):** ...
 
         **5. Conclusão Consultiva**
-        (Finalize com um parágrafo encorajador, reforçando que a Lei do Bem é um instrumento estratégico para aumentar a competitividade e que, seguindo as recomendações, a empresa estará bem posicionada para aproveitar os benefícios.)
+        (Finalize com um parágrafo encorajador, reforçando que a Lei do Bem é um instrumento estratégico e que, seguindo as recomendações, a empresa estará bem posicionada para aproveitar os benefícios.)
     `;
 
     try {
