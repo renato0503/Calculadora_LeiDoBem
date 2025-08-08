@@ -1,92 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f7f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
     color: #333;
     margin: 0;
     padding: 20px;
 }
+
 .container {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 900px;
+    margin: 20px auto;
     background: #fff;
-    padding: 20px 40px;
+    padding: 30px 40px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
 h1, h2, h3 {
-    color: #0056b3;
+    color: #1c293a;
+    margin-top: 0;
 }
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.5rem; }
+
 form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 25px;
 }
+
 input[type="text"], input[type="password"], input[type="number"], textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
     width: 100%;
     box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
-button {
+
+input:focus, textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+    color: #495057;
+}
+
+button, .btn-voltar {
     background-color: #007bff;
     color: white;
-    padding: 12px 20px;
+    padding: 12px 25px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.1s;
 }
-button:hover {
+
+button:hover, .btn-voltar:hover {
     background-color: #0056b3;
 }
+
+button:active {
+    transform: translateY(1px);
+}
+
 .btn-logout {
-    float: right;
-    background-color: #dc3545;
+    background-color: #6c757d;
 }
 .btn-logout:hover {
-    background-color: #c82333;
+    background-color: #5a6268;
 }
+
 .btn-voltar {
     display: inline-block;
     margin-top: 20px;
     text-decoration: none;
     background-color: #6c757d;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 4px;
 }
+
+
 fieldset {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 25px;
+    background-color: #f8f9fa;
 }
+
 legend {
     color: #0056b3;
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 0 10px;
 }
-label {
-    display: block;
-    margin-bottom: 10px;
+
+.question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #e9ecef;
 }
+.question:last-child {
+    border-bottom: none;
+}
+.question span {
+    margin-right: 20px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 10px;
+}
+.radio-group input[type="radio"] {
+    display: none;
+}
+.radio-group label {
+    padding: 8px 20px;
+    border: 1px solid #ced4da;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: normal;
+    margin: 0;
+}
+.radio-group input[type="radio"]:checked + label {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
 .hidden {
     display: none;
 }
 #loading {
     text-align: center;
     color: #007bff;
-    font-weight: bold;
+    font-weight: 600;
     margin-top: 15px;
 }
+
 .relatorio-ia {
     white-space: pre-wrap;
-    background-color: #f8f9fa;
-    border-left: 5px solid #007bff;
-    padding: 15px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    padding: 25px;
     margin-top: 20px;
-    border-radius: 4px;
+    border-radius: 8px;
     text-align: left;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
+    line-height: 1.7;
+}
+
+.relatorio-ia strong {
+    color: #0056b3;
+    font-size: 1.1rem;
 }
